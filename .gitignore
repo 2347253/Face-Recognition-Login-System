@@ -1,0 +1,17 @@
+# Ignore Python files
+*.pyc
+__pycache__/
+
+# Ignore virtual environments
+venv/
+env/
+
+# Ignore Django secrets
+*.sqlite3
+db.sqlite3
+*.log
+
+# Ignore media and dataset files
+media/
+Face_Detection/dataset/
+Face_Detection/trainer/

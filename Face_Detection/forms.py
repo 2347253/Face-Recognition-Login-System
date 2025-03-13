@@ -1,7 +1,7 @@
 from django import forms
-from .models import *
+from .models import UserProfile
 
-class ResgistrationForm(forms.ModelForm):
+class RegistrationForm(forms.ModelForm):  # Fix typo in class name
     class Meta:
         model = UserProfile
         fields = [
@@ -12,6 +12,7 @@ class ResgistrationForm(forms.ModelForm):
             'phone',
             'email',
             'bio',
-            'image'
-
+            'image',
         ]
+
+    image = forms.ImageField(required=False)  # Ensure image field is correctly handled

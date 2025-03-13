@@ -2,9 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Greeting</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #EDE8DC;
+            color: #5C3D2E;
+}
+        .profile-card {
+            background-color:white;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(177, 127, 89, 0.4); /* Soft brown shadow */
+            border: 2px solid #A5B68D; /* Sage border */
+            padding: 20px;
+        }
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+    </style>
 </head>
 <body>
-<h1>Welcome to {{ user.name }}</h1>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="profile-card text-center p-4">
+                    {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="Profile Picture" width="150" height="150">
+                    {% else %}
+                        <img src="/static/images/default.jpg" alt="Default Profile Picture">
+                    {% endif %}
+                    <h2>{{ user.name }}</h2>
+                    <p>Email: {{ user.email }}</p>
+                    <p>Phone: {{ user.phone }}</p>
+                    <p>Job: {{ user.job }}</p>
+                    <p>Address: {{ user.address }}</p>
+                    <p>Bio: {{ user.bio }}</p>
+                    <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
+
+
 </html>

@@ -4,10 +4,13 @@ import os
 import numpy as np
 from PIL import Image
 from FaceDetection.settings import BASE_DIR
+import time
+
+print('hi')
 
 detector = cv2.CascadeClassifier(BASE_DIR+'/Face_Detection/haarcascade_frontalface_default.xml')
 recognizer = cv2.face.LBPHFaceRecognizer_create()
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # # Create a connection witn databse
 # conn = sqlite3.connect('db.sqlite3')
@@ -26,9 +29,7 @@ class FaceRecognition:
         face_id = Entry1
         cam = cv2.VideoCapture(0)
         
-
         count = 0
-
         while(True):
 
             ret, img = cam.read()
@@ -42,7 +43,7 @@ class FaceRecognition:
                 count += 1
 
                 # Save the captured image into the datasets folder
-                cv2.imwrite(BASE_DIR+'/Face_Detection/dataset/User.' + str(face_id) + '.' + str(count) + ".jpg", gray[y:y+h,x:x+w])
+                cv2.imwrite(BASE_DIR+'/dataset/User.' + str(face_id) + '.' + str(count) + ".jpg", gray[y:y+h,x:x+w])
 
                 cv2.imshow('Register Face', img)
 
@@ -52,14 +53,13 @@ class FaceRecognition:
             elif count >= 30: # Take 30 face sample and stop video
                 break
     
-    
         cam.release()
         cv2.destroyAllWindows()
 
     
     def trainFace(self):
         # Path for face image database
-        path = BASE_DIR+'/Face_Detection/dataset'
+        path = BASE_DIR+'/dataset'
 
         # function to get the images and label data
         def getImagesAndLabels(path):
@@ -94,10 +94,21 @@ class FaceRecognition:
         print("\n {0} faces trained. Exiting Program".format(len(np.unique(ids))))
 
 
+
+
     def recognizeFace(self):
-        recognizer.read(BASE_DIR+'/Face_Detection/trainer/trainer.yml')
-        cascadePath = BASE_DIR+'/Face_Detection/haarcascade_frontalface_default.xml'
-        faceCascade = cv2.CascadeClassifier(cascadePath)
+        model_path = os.path.join(BASE_DIR, 'trainer/trainer.yml')
+        cascade_path = os.path.join(BASE_DIR, 'haarcascade_frontalface_default.xml')
+
+        # Check if the trained model exists
+        if not os.path.exists(model_path):
+            print("\n ❌ Error: Face recognition model not found! Train the model first.")
+            return None
+
+        recognizer = cv2.face.LBPHFaceRecognizer_create()
+        recognizer.read(model_path)
+
+        face_cascade = cv2.CascadeClassifier(cascade_path)
 
         font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -105,47 +116,67 @@ class FaceRecognition:
         cam = cv2.VideoCapture(0)
 
         # Define min window size to be recognized as a face
-        minW = 0.1*cam.get(3)
-        minH = 0.1*cam.get(4)
+        minW = 0.1 * cam.get(3)
+        minH = 0.1 * cam.get(4)
+
+        start_time = time.time()  # Track start time
 
         while True:
+            ret, img = cam.read()
+            if not ret:
+                print("\n ❌ Error: Failed to capture image from webcam.")
+                break
 
-            ret, img =cam.read()
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-            gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-            faces = faceCascade.detectMultiScale( 
+            faces = face_cascade.detectMultiScale(
                 gray,
-                scaleFactor = 1.2,
-                minNeighbors = 5,
-                minSize = (int(minW), int(minH)),
+                scaleFactor=1.2,
+                minNeighbors=5,
+                minSize=(int(minW), int(minH)),
             )
 
-            for(x,y,w,h) in faces:
+            if len(faces) == 0:
+                print("⚠️ No face detected. Please position your face properly.")
 
-                cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0), 2)
+            for (x, y, w, h) in faces:
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-                face_id, confidence = recognizer.predict(gray[y:y+h,x:x+w])
+                try:
+                    face_id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
+                except Exception as e:
+                    print(f"\n ❌ Error in prediction: {e}")
+                    continue
 
-                # Check if confidence is less then 100 ==> "0" is perfect match 
-                if (confidence < 100):
-                    name = 'Detected'
-                else:
-                    name = "Unknown"
-                
-                cv2.putText(img, str(name), (x+5,y-5), font, 1, (255,255,255), 2)
-                cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)  
-            
-            cv2.imshow('Detect Face',img) 
+                if confidence < 50:  # Recognized user
+                    name = f"Detected (ID: {face_id})"
+                    print(f"\n ✅ Face Recognized! ID: {face_id} | Confidence: {confidence:.2f}")
+                    cv2.putText(img, name, (x + 5, y - 5), font, 1, (0, 255, 0), 2)
+                    cv2.putText(img, f"{confidence:.2f}", (x + 5, y + h - 5), font, 1, (0, 255, 0), 1)
+                    cam.release()
+                    cv2.destroyAllWindows()
+                    return face_id  # Return recognized ID
 
-            k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
+                else:  # Unknown user
+                    name = "User Not Recognized"
+                    print(f"\n ❌ Unknown User | Confidence: {confidence:.2f}")
+                    cv2.putText(img, name, (x + 5, y - 5), font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, f"{confidence:.2f}", (x + 5, y + h - 5), font, 1, (0, 0, 255), 1)
+
+            cv2.imshow('Detect Face', img)
+
+            # Check if 8 seconds have passed
+            if time.time() - start_time > 8:
+                print("\n ❌ User Not Recognized - Redirecting to Warning Screen...")
+                cam.release()
+                cv2.destroyAllWindows()
+                return None  # 🚨 Trigger the warning page
+
+            k = cv2.waitKey(10) & 0xff  # Press 'ESC' to exit manually
             if k == 27:
                 break
-            if confidence > 50:
-                break
 
-        print("\n Exiting Program")
+        print("\n ❌ Exiting Program")
         cam.release()
         cv2.destroyAllWindows()
-        print(face_id)
-        return face_id
+        return None
