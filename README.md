@@ -48,7 +48,8 @@ source .venv/bin/activate  # On Windows, use `.venv\Scripts\activate`
 
 ### 3️⃣ Install Dependencies:
 ```sh
-pip install django, 
+pip install django opencv-python numpy pillow djangorestframework
+pip install face-recognition dlib
 ```
 
 ### 4️⃣ Apply Migrations: 
