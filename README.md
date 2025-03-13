@@ -34,11 +34,6 @@ git clone https://github.com/2347253/Face-Recognition-Login-System.git
 cd Face-Recognition-Login-System
 ```
 
-### 2️⃣ Create a Virtual Environment:
-```sh
-python -m venv .venv
-source .venv/bin/activate  # On Windows, use `.venv\Scripts\activate`
-```
 
 ### 2️⃣ Create a Virtual Environment:
 ```sh
