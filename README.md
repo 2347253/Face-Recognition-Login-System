@@ -1,28 +1,73 @@
-# Face-recognition-registration-and-login-system-OpenCv-Django
+# Face Recognition Registration and Login System (OpenCV + Django)
 
-# Requirements
-- Basic Django
-- Basic Python and knowledge about OOP
-- A good IDE like pycharm
+This project is a **Face Recognition-based Authentication System** built using **Django** and **OpenCV**. Users can **register** with their face data and later log in using face recognition.
 
-# Instalisation
+---
 
-- Linux:
-``` pip3 install django ```  
-``` pip3 in opencv-python==3.4.2.17 ```
-- Windows:
-``` pip install django ```
-``` pip3 in opencv-python==3.4.2.17 ```
+## 🔧 Features
+- **Face Registration: Users can register with their facial images.**
+- **Face Recognition Login: Authenticates users using real-time face detection.**
+- **Dataset Management: Saves user facial images for training.**
+- **Face-based Login Authentication**
+- **Django Admin Panel for User Management**
+- **Haar Cascade Classifier: Uses OpenCV's ```haarcascade_frontalface_default.xml``` for face detection.`**
 
-# Project creation command:
-``` django-admin startproject Face-recognition-registration-and-login-system-OpenCv-Django```
+---
 
-# Important command for this project-
-``` python3 manage.py startapp app_name ``` - **For Creating App**  
-``` python3 manage.py makemigrations``` - **Migrations Model**  
-``` python3 manage.py migrate```- **For migrating to Database** 
+## 🛠 Requirements
+- Python (3.x)
+- Django
+- OpenCV (`opencv-python`)
+- NumPy
+- A good IDE like **VS Code** or **PyCharm**
+- SQLite
+- Webcam (for face recognition)
+- Git & Github
 
-# Descriptions
+---
 
-This is ML base face recognition system. Using that we can register and recognise face of person.
+## 📦 Installation
 
+### 1️⃣ Clone the Repository:
+```sh
+git clone https://github.com/2347253/Face-Recognition-Login-System.git
+cd Face-Recognition-Login-System
+```
+
+
+### 2️⃣ Create a Virtual Environment:
+```sh
+python -m venv .venv
+source .venv/bin/activate  # On Windows, use `.venv\Scripts\activate`
+```
+
+### 3️⃣ Install Dependencies:
+```sh
+pip install django opencv-python numpy pillow djangorestframework
+pip install face-recognition dlib
+```
+
+### 4️⃣ Apply Migrations: 
+```sh
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### 5️⃣ Run the Development Server: 
+```sh
+python managae.py runserver
+```
+
+### 🖼️ Face Detection & Recognition
+
+The system:
+
+- Captures face images during registration.
+- Stores images in the dataset/ folder.
+- Trains the face recognition model (trainer.yml).
+- Recognizes faces during login using Haarcascade.
+
+
+_Backend Logic Credits to
+github.com/GenesisBlock3301 
+N A Sifat_
